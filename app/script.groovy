@@ -12,4 +12,14 @@ def deployApp(String ipAddress) {
   }
 }
 
+def deployScript(String ipAddress) {
+  echo 'deploying the application using shell script...'
+  def shellCmd = "bash ./deploy.sh"
+  sshagent(['aws-ec2']) {
+    sh "scp deploy.sh ec2-user@${ipAddress}:/home/ec2-user"
+    sh "scp docker-compose.yaml ec2-user@${ipAddress}:/home/ec2-user"
+    sh "ssh -o StrictHostKeyChecking=no ec2-user@${ipAddress} ${shellCmd}"
+  }
+}
+
 return this

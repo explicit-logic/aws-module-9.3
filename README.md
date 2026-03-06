@@ -109,3 +109,7 @@ cat ~/.ssh/app-key.pem
 ```
 
 ![](./images/deploy-simple.gif)
+
+
+### Improvement: Extract multiple Linux commands that are executed on remote server into a separate shell script and execute the script from Jenkinsfile
+

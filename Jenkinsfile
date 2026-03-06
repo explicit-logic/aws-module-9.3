@@ -72,7 +72,10 @@ pipeline {
       steps {
         dir('app') {
           script {
-            gv.deployApp(params.EC2_PUBLIC_IP)
+            // Deploy without shell script
+            // gv.deployApp(params.EC2_PUBLIC_IP)
+
+            gv.deployScript(params.EC2_PUBLIC_IP)
           }
         }
       }
