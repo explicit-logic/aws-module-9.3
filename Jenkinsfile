@@ -18,6 +18,7 @@ pipeline {
   }
   parameters {
     string(name: 'DOCKER_IMAGE', defaultValue: 'explicitlogic/app')
+    string(name: 'DOCKER_TAG', defaultValue: 'script')
     string(name: 'EC2_PUBLIC_IP', defaultValue: '54.93.40.224')
   }
   stages {
@@ -60,9 +61,9 @@ pipeline {
       steps {
         dir('app') {
           script {
-            buildImage(params.DOCKER_IMAGE, env.BRANCH_NAME)
+            buildImage(params.DOCKER_IMAGE, params.DOCKER_TAG)
             dockerLogin()
-            dockerPush(params.DOCKER_IMAGE, env.BRANCH_NAME)
+            dockerPush(params.DOCKER_IMAGE, params.DOCKER_TAG)
           }
         }
       }
@@ -73,9 +74,9 @@ pipeline {
         dir('app') {
           script {
             // Deploy without shell script
-            // gv.deployApp(params.EC2_PUBLIC_IP)
+            // gv.deployApp([image: params.DOCKER_IMAGE, tag: env.BRANCH_NAME], params.EC2_PUBLIC_IP)
 
-            gv.deployScript(params.EC2_PUBLIC_IP)
+            gv.deployScript([image: params.DOCKER_IMAGE, tag: params.DOCKER_TAG], params.EC2_PUBLIC_IP)
           }
         }
       }

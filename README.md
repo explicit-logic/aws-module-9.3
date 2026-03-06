@@ -108,8 +108,13 @@ To copy the private key content, run:
 cat ~/.ssh/app-key.pem
 ```
 
+- Run pipeline job
+
 ![](./images/deploy-simple.gif)
 
 
 ### Improvement: Extract multiple Linux commands that are executed on remote server into a separate shell script and execute the script from Jenkinsfile
 
+See groovy deploy script: `app/script.groovy` (`deployScript`)
+
+- Run pipeline job
