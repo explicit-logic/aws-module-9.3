@@ -22,55 +22,61 @@ https://www.techworld-with-nana.com/devops-bootcamp
 > The EC2 instance must be launched with Docker installed.
 > See [aws-module-9.1](https://github.com/explicit-logic/aws-module-9.1) for setup instructions.
 
-> Authenticate with Docker Hub before proceeding:
+> **Authenticate with Docker Hub before proceeding:**
 > ```bash
 > docker login
 > ```
 
 ---
 
-### Install Docker Compose on AWS EC2 Instance
+## Setup
 
-Follow the instractions here: https://gist.github.com/npearce/6f3c7826c7499587f00957fee62f8ee9
+### 1. Install Docker Compose on AWS EC2 Instance
 
-Run installation:
+> Reference: https://gist.github.com/npearce/6f3c7826c7499587f00957fee62f8ee9
+
+**Download the binary:**
 ```sh
 sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose
 ```
 
-Fix permissions after download:
+**Fix permissions:**
 ```sh
 sudo chmod +x /usr/local/bin/docker-compose
 ```
 
-Verify success:
+**Verify installation:**
 ```sh
 docker-compose version
 ```
 
-### Create `docker-compose.yml` file that deploys our web application image
+---
 
-See the file: [./docker-compose.yaml](./docker-compose.yaml)
+### 2. Create `docker-compose.yml`
+
+See [./docker-compose.yaml](./docker-compose.yaml) for the configuration that deploys the web application image.
 
 ---
 
-### Configure Jenkins pipeline to deploy newly built image using Docker Compose on EC2 server
+### 3. Configure Jenkins Multibranch Pipeline
 
-See groovy deploy script: `app/script.groovy` (`deployApp`)
+> Groovy deploy function: `deployApp` in [app/script.groovy](./app/script.groovy)
+
+#### Create the Pipeline Job
 
 1. Go to **Dashboard** → **New Item**
 2. Name it `aws-multibranch`, select **Multibranch Pipeline**, click **OK**
 
 #### Branch Sources
 
-- Click **Add source** → **Git**
+Click **Add source** → **Git** and configure:
 
 | Field | Value |
 |---|---|
 | Credentials | `github` |
 | Repository HTTPS URL | `https://github.com/explicit-logic/aws-module-9.3` |
 
-- Click **Validate** to confirm access
+Click **Validate** to confirm access.
 
 #### Behaviors
 
@@ -86,11 +92,11 @@ Click **Add** and include:
 
 #### Scan Multibranch Pipeline Triggers
 
-3. Click **Save** — Jenkins will scan the repository and automatically create jobs for each branch
+Click **Save** — Jenkins will scan the repository and automatically create jobs for each branch.
 
 ---
 
-### Create SSH Key Credentials for the EC2 Server
+### 4. Create SSH Key Credentials for the EC2 Server
 
 1. Navigate to the `aws-multibranch` pipeline → **Credentials** → **Add Credentials**
 
@@ -101,20 +107,25 @@ Click **Add** and include:
 | Kind | `SSH Username with private key` |
 | ID | `aws-ec2` |
 | Username | `ec2-user` |
-| Private Key | Paste the contents of your `.pem` file (see below) |
+| Private Key | Paste the contents of your `.pem` file |
 
-To copy the private key content, run:
+To copy the private key content:
 ```bash
 cat ~/.ssh/app-key.pem
 ```
 
-- Run pipeline job
+3. Run the pipeline job.
 
-![](./images/deploy-simple.gif)
+![Deploy (simple)](./images/deploy-simple.gif)
 
+---
 
-### Improvement: Extract multiple Linux commands that are executed on remote server into a separate shell script and execute the script from Jenkinsfile
+### 5. Improvement: Shell Script Extraction
 
-See groovy deploy script: `app/script.groovy` (`deployScript`)
+Instead of embedding multiple remote commands inline in the Jenkinsfile, they are extracted into a dedicated shell script that gets copied and executed on the EC2 server.
 
-- Run pipeline job
+> Groovy deploy function: `deployScript` in [app/script.groovy](./app/script.groovy)
+
+Run the pipeline job to verify:
+
+![Deploy (script)](./images/deploy-script.gif)
